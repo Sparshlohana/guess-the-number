@@ -1,14 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import SendIcon from './Icons';
+import { SendIcon } from './Icons';
 import { Bounce, ToastContainer, toast } from 'react-toastify';
+import Timer from './Timer';
 
-const MainChat = ({ initialRandomNumber }) => {
+const MainChat = ({ initialRandomNumber, durationTime, setLevel, bgMusicData, sendBtnMusic, winningMusicData }) => {
     const [inputNumber, setInputNumber] = useState('');
     const [messages, setMessages] = useState([]);
-    const [bgMusic, setBgMusic] = useState(null);
-    const [winningMusic, setWinningMusic] = useState(new Audio('/winning-music2.mp3'));
-    const [sendButtonSound, setSendButtonSound] = useState(new Audio('/sendBtn.mp3'));
+    const [bgMusic, setBgMusic] = useState(new Audio(bgMusicData));
+    const [winningMusic, setWinningMusic] = useState(new Audio(winningMusicData));
+    const [sendButtonSound, setSendButtonSound] = useState(new Audio(sendBtnMusic));
+    console.log(sendButtonSound);
+    const [duration, setDuration] = useState(durationTime);
+    const [timerStarted, setTimerStarted] = useState(false);
     const [count, setCount] = useState(0);
+    const [timer, setTimer] = useState(null);
+    const [remainingTime, setRemainingTime] = useState(duration);
+    const [timerDurationTitle, setTimerDurationTitle] = useState('');
+    console.log(duration, 'durationTime');
 
     const success = () => toast.success(`🎉 Congratulations! You guessed in ${count + 1} attempts`, {
         position: "top-right",
@@ -16,23 +24,29 @@ const MainChat = ({ initialRandomNumber }) => {
 
 
     useEffect(() => {
-        setBgMusic(new Audio('/bg-music.mp3'));
-        setSendButtonSound(new Audio('/sendBtn.mp3')); // Load send button sound
+        setBgMusic(new Audio(bgMusicData));
+        setSendButtonSound(new Audio(sendBtnMusic)); // Load send button sound
+        setTimerDurationTitle("Time Remaining: ");
     }, []);
 
     const playBackgroundMusic = () => {
         if (bgMusic) {
-            bgMusic.play();
+            bgMusic?.play();
         }
     };
 
     const playSendButtonSound = () => {
         if (sendButtonSound) {
-            sendButtonSound.play();
+            sendButtonSound?.play();
         }
     };
 
     const handleSendMessage = () => {
+        if (!timerStarted) {
+            startTimer();
+            setTimerStarted(true);
+        }
+
         playBackgroundMusic();
         setCount((prevCount) => prevCount + 1);  // Increase count when a message is sent
 
@@ -51,10 +65,12 @@ const MainChat = ({ initialRandomNumber }) => {
             } else {
                 newMessages = [...messages, { sender: 'user', text: `${userGuess}`, align: 'text-end' }, { sender: 'system', text: `Congratulations! You guessed the correct number.`, align: 'left' }];
                 if (bgMusic) {
-                    bgMusic.pause();
+                    bgMusic?.pause();
                     bgMusic.currentTime = 0;
                 }
-                winningMusic.play();
+                setRemainingTime(5000)
+                winningMusic?.play();
+                setTimerDurationTitle(`Next level starting in: `);
                 success();
             }
 
@@ -68,6 +84,12 @@ const MainChat = ({ initialRandomNumber }) => {
             handleSendMessage();
         }
     };
+
+    const startTimer = () => {
+        setTimer(true);
+        setRemainingTime(duration);
+    };
+
 
     return (
         <>
@@ -84,7 +106,8 @@ const MainChat = ({ initialRandomNumber }) => {
                 theme="dark"
                 transition={Bounce}
             />
-            <div className="h-[65vh] w-full flex justify-start items-center text-white">
+            <Timer timerDurationTitle={timerDurationTitle} setLevel={setLevel} timerDuration={duration} timer={timer} remainingTime={remainingTime} setRemainingTime={setRemainingTime} setTimer={setTimer} />
+            <div className="h-[65vh] w-full flex justify-start items-center text-white mt-2">
                 <div className="card shadow-lg relative h-[500px] w-[450px] ml-56 rounded-xl">
                     <div className='mt-3'>
                         <h1 className='text-center text-2xl font-semibold underline capitalize'>Guess The Number</h1>

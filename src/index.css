@@ -2,20 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
-*::-webkit-scrollbar{
+*::-webkit-scrollbar {
     width: 5px;
 }
 
 *::-webkit-scrollbar-thumb {
     background: #380b0d;
     border-radius: 10px;
-}
-
-body {
-    background: url("../public/mario-bros-background.jpg");
-    height: 100vh;
-    width: 100%;
-    background-size: cover;
 }
 
 .card {
@@ -35,4 +28,10 @@ input::-webkit-inner-spin-button {
 /* Firefox */
 input[type=number] {
     -moz-appearance: textfield;
+}
+
+.cover {
+    height: 100vh;
+    width: 100%;
+    background-size: cover !important;
 }
